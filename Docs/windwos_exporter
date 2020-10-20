@@ -1,0 +1,5 @@
+#下载
+Windows_exporter:   https://github.com/prometheus-community/windows_exporter/releases,download windows_exporter-0.14.0-386.msi
+
+#安装
+下载到windows的任意目录，直接双击安装，在服务或者任务管理器--进程里能看到windows_exporter进程即可。

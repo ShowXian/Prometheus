@@ -1,0 +1,27 @@
+#下载alertmanager
+Alertmanager:       wget https://prometheus.io/download/alertmanager-0.21.0.linux-amd64.tar.gz
+#解压
+tar -zxf alertmanager-0.21.0.linux-amd64.tar.gz -C /opt
+#授权
+chown prometheus.prometheus -R /opt/aletmanager/
+#改名
+mv alertmanager-0.21.0.linux-amd64 alertmanager
+#添加系统服务
+cat > /etc/systemd/system/alertmanager.service <<EOF
+[Unit]
+Description=alertmanager
+After=network.target
+[Service]
+Type=simple
+User=prometheus
+ExecStart=/opt/alertmanager/alertmanager --config.file=/opt/alertmanager/alertmanager.yml --storage.path=/opt/alertmanager/data --cluster.advertise-address=0.0.0.0:9093
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl start alertmanager
+systemctl status alertmanager
+systemctl enable alertmanager
+

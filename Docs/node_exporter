@@ -1,0 +1,26 @@
+#下载
+Node_exporter:      wget https://prometheus.io/download/node_exporter-1.0.1.linux-amd64.tar.gz
+#解压
+tar -zxf node_exporter-1.0.1.linux-amd64.tar.gz -C /opt
+#改名
+mv node_exporter-1.0.1.linux-amd64 node_exporter
+#授权
+chown prometheus.prometheus -R /opt/node_exporter/
+#添加系统服务配置开机自启动
+cat > /etc/systemd/system/node_exporter.service <<EOF
+[Unit]
+Description=node_exporter
+After=network.target
+[Service]
+Type=simple
+User=prometheus
+ExecStart=/opt/node_exporter/node_exporter
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl start node_exporter
+systemctl status node_exporter
+systemctl enable node_exporter

@@ -1,0 +1,36 @@
+#下载安装包
+Promethues:         wget https://prometheus.io/download/prometheus-2.22.0.linux-amd64.tar.gz
+
+#解压缩
+tar -zxf prometheus-2.22.0.linux-amd64.tar.gz -C /opt
+
+#改名
+cd /opt
+mv prometheus-2.22.0.linux-amd64  promethues
+
+#添加管理用户，配置系统服务，开机自启动
+groupadd prometheus
+useradd -g prometheus -m -d /root/prometheus -s /sbin/nologin prometheus
+chown prometheus.prometheus -R /opt/prometheus
+
+#添加系统服务项
+cat > /etc/systemd/system/prometheus.service <<EOF
+[Unit]
+Description=prometheus
+After=network.target
+[Service]
+Type=simple
+User=prometheus
+ExecStart=/opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml --storage.tsdb.path=/opt/prometheus/data 
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl start prometheus
+systemctl status prometheus
+systemctl enable prometheus
+
+#检查服务是否启动
+netstat -lntp
