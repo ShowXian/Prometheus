@@ -7,3 +7,4 @@ alertmanager\
 influxdb\
 Prometheus Federation\
 use Grafana show the monitoring information\
+Learn the document of installing Prometheus by yourself. Please give suggestions
