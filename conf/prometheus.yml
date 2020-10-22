@@ -1,0 +1,88 @@
+# my global config
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+remote_write:
+#  - url: "http://127.0.0.1:8086/api/v1/prom/write?db=prometheus&u=admin&p=Admin123"
+  - url: "http://127.0.0.1:8086/api/v1/prom/write?db=prometheus"
+    basic_auth:
+      username: admin
+      password: Admin123
+remote_read:
+  - url: "http://127.0.0.1:8086/api/v1/prom/read?db=prometheus"
+    basic_auth:
+      username: admin
+      password: Admin123    
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: ['X.X.X.X:9093']
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+  - "/opt/alertmanager/rules/node_rules.yml"
+
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+#  - job_name: 'prometheus'
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+  - job_name: 'prometheus-server'
+    file_sd_configs:
+    - refresh_interval: 1m
+      files:
+      - targets/server.json
+
+  - job_name: 'linux_base'
+    file_sd_configs:
+    - refresh_interval: 1m
+      files:
+      - config_exporter.json
+
+
+  - job_name: 'job_name-Windows'
+    static_configs:
+    - targets: ['x.x.x.x:9182']
+
+
+  - job_name: 'job_name-Linux'
+    static_configs: 
+    - targets:  ['x.x.x.x:9100']
+
+#prometheus联邦,注意9090和9100端口放开
+
+  - job_name: 'job_name'
+    scrape_interval: 15s
+    honor_labels: true
+    metrics_path: '/federate'
+    params:
+      'match[]':
+        - '{job="另外一个server上的job_name"}'
+        - '{__name__=~"instance.*"}'
+    static_configs:
+      - targets:
+        - 'x.x.x.x:9090' #另外一个server的ip
+  
+  - job_name: 'Linux-vpc1'
+    scrape_interval: 15s
+    honor_labels: true
+    metrics_path: '/federate'
+    params:
+      'match[]':
+        - '{job="Linux-host"}'
+        - '{__name__=~"instance.*"}'
+    static_configs:
+      - targets:
+        - '192.168.1.1:9090'
+
