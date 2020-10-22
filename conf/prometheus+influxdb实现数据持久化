@@ -1,0 +1,79 @@
+#prometheus数据是写在本地磁盘上，默认保留15天，将数据写入influxdb，需要依赖remote_storage_adapter，对该模块进行go编译，prometheus配置文件上的global添加remote_wirte和remote_read两个参数
+#下载go安装包，https://golang.org
+#下载influxdb,启动、开机自启
+vim /etc/yum.repos.d/influxdb.repo 
+[influxdb]
+name = InfluxDB Repository - RHEL $releasever
+baseurl = https://repos.influxdata.com/rhel/$releasever/$basearch/stable
+enabled = 1
+gpgcheck = 1
+gpgkey = https://repos.influxdata.com/influxdb.key
+
+yum -y install influxdb
+systemctl enabled influxdb
+systemctl start influxdb
+systemctl status influxdb
+
+#进入数据库
+influx -precision rfc3339  #参数可以把时间转化为正常显示的时间
+#创建数据库和用户
+> create database prometheus
+> create user "admin" with password 'Admin123' with all privileges
+> show databases;
+name: databases
+name
+----
+prometheus
+_internal
+> use telegraf
+Using database prometheus
+> show measurements;
+
+#github上下载remote_storage_adapter
+git clone git@github.com:prometheus/prometheus.git
+
+
+#修改prometheus.yml,global下添加remote_write/remote_read参数
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+  #
+remote_write:
+  - url: "http://127.0.0.1:8086/api/v1/prom/write?db=prometheus"
+    basic_auth:
+      username: admin
+      password: Admin123
+remote_read:
+  - url: "http://127.0.0.1:8086/api/v1/prom/read?db=prometheus"
+    basic_auth:
+       username: admin
+       password: Admin123    
+
+#进入remote_storage_adapter目录
+cd prometheus/documentation/examples/remote_storage/remote_storage_adapter/
+./go build
+#当前目录多一个可执行文件remote_storage_adapter
+./remote_storage_adapter --influxdb-url=http://localhost:8086/ --influxdb.database="prometheus" --influxdb.retention-policy=autogen &
+#查看当前服务
+netstat -lntp
+tcp6       0      0 :::9201                 :::*                    LISTEN      32801/./remote_stor 
+
+#检查prometheus配置文件并reload服务
+#查看数据库是否新增node参数
+influx -precision rfc3339
+use prometheus;
+> show measurements;
+name: measurements
+name
+----
+ALERTS
+ALERTS_FOR_STATE
+go_gc_duration_seconds
+go_gc_duration_seconds_count
+go_gc_duration_seconds_sum
+go_goroutines
+go_info
+......
+
+
