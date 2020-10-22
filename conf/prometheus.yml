@@ -48,7 +48,7 @@ scrape_configs:
     file_sd_configs:
     - refresh_interval: 1m
       files:
-      - config_exporter.json
+      - config_exporter.json #被监控主机ip信息，需要在当前目录
 
 
   - job_name: 'job_name-Windows'

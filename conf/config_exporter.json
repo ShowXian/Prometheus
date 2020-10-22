@@ -1,0 +1,10 @@
+[
+  {
+    "targets": [ "x.x.x.x:9100",'x.x.x.x:9182'],
+    "labels": {
+      "env": "prod"
+    }
+  }
+
+]
+
