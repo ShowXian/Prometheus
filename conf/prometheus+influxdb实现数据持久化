@@ -25,7 +25,7 @@ name
 ----
 prometheus
 _internal
-> use telegraf
+> use promethues
 Using database prometheus
 > show measurements;
 
@@ -54,7 +54,25 @@ remote_read:
 cd prometheus/documentation/examples/remote_storage/remote_storage_adapter/
 ./go build
 #当前目录多一个可执行文件remote_storage_adapter
-./remote_storage_adapter --influxdb-url=http://localhost:8086/ --influxdb.database="prometheus" --influxdb.retention-policy=autogen &
+#添加remote_storage_adapter为系统服务
+# cat /etc/systemd/system/remote_storage_adapter.service 
+[Unit]
+Description=remote_storage_adapter
+After=network.target
+
+[Service]
+Type=simple
+User=prometheus
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+ExecStart=/opt/remote_storage_adapter --influxdb-url=http://localhost:8086 --influxdb.database=prometheus --influxdb.retention-policy=autogen
+[Install]
+WantedBy=multi-user.target
+
+systemctl daemon-reload
+systemctl start remote_storage_adapter.service
+systemctl status remote_storage_adapter.service
+systemctl enable remote_storage_adapter.service
 #查看当前服务
 netstat -lntp
 tcp6       0      0 :::9201                 :::*                    LISTEN      32801/./remote_stor 
