@@ -21,7 +21,7 @@ After=network.target
 [Service]
 Type=simple
 User=prometheus
-ExecStart=/opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml --storage.tsdb.path=/opt/prometheus/data 
+ExecStart=/opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml --storage.tsdb.retention.time=2h --storage.tsdb.path=/opt/prometheus/data 
 Restart=on-failure
 [Install]
 WantedBy=multi-user.target
