@@ -25,7 +25,7 @@ name
 ----
 prometheus
 _internal
-> use promethues
+> use prometheus
 Using database prometheus
 > show measurements;
 
