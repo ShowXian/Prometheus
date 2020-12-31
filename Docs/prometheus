@@ -22,10 +22,11 @@ After=network.target
 Type=simple
 User=prometheus
 ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml --storage.tsdb.retention.time=2h --storage.tsdb.path=/opt/prometheus/data 
+ExecStart=/opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml --storage.tsdb.path=/opt/prometheus/data --storage.tsdb.retention.time=2h --web.enable-lifecycle 
 Restart=on-failure
 [Install]
 WantedBy=multi-user.target
+
 EOF
 
 systemctl daemon-reload
