@@ -15,6 +15,7 @@ After=network.target
 Type=simple
 User=prometheus
 ExecStart=/opt/node_exporter/node_exporter
+#ExecStart=/opt/node_exporter/node_exporter --web.listen-address=:9120 ##修改服务端口
 Restart=on-failure
 [Install]
 WantedBy=multi-user.target
