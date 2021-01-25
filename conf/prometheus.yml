@@ -86,3 +86,35 @@ scrape_configs:
       - targets:
         - '192.168.1.1:9090'
 
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response.
+    static_configs:
+      - targets: ['http://x.x.x.x:3000'] # Target to probe with http on port 8080.
+        labels: 
+          group: 'grafana'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115  # The blackbox exporter's real hostname:port.
+
+
+  - job_name: 'port'
+    metrics_path: /probe
+    params:
+      module: [tcp_connect] 
+    static_configs:
+      - targets: ['x.x.x.x:8086'] 
+        labels: 
+          group: 'influxdb'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115 
