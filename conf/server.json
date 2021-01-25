@@ -1,0 +1,40 @@
+[
+   {
+      "targets": [
+         "172.16.0.96:19100"
+      ],
+      "labels": {
+         "project_name": "项目测试20200413",
+         "env_name": "开发环境",
+         "soft_name": "测试应用20200413",
+         "template_name": "测试模板20200413",
+         "template_type": "主机模板"
+      }
+   },
+ {
+      "targets": [
+         "172.16.0.96:30013",
+         "172.16.0.96:30015"
+      ],
+      "labels": {
+         "project_name": "项目测试20200413",
+         "env_name": "开发环境",
+         "soft_name": "测试应用20200413",
+         "template_name": "测试模板20200413",
+         "template_type": "主机模板"
+      }
+   },
+{
+      "metrics_path": "/_prometheus/metrics",
+      "targets": [
+         "172.16.0.96:9200"
+      ],
+      "labels": {
+         "project_name": "项目测试20200413",
+         "env_name": "开发环境",
+         "soft_name": "测试应用20200413",
+         "template_name": "测试模板20200413",
+         "template_type": "主机模板"
+      }
+   }
+]
